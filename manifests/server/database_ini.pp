@@ -49,14 +49,14 @@ class puppetdb::server::database_ini(
   # Validate the database connection.  If we can't connect, we want to fail
   # and skip the rest of the configuration, so that we don't leave puppetdb
   # in a broken state.
-  class { 'puppetdb::server::validate_db':
-    database          => $database,
-    database_host     => $database_host,
-    database_port     => $database_port,
-    database_username => $database_username,
-    database_password => $database_password,
-    database_name     => $database_name,
-  }
+  #class { 'puppetdb::server::validate_db':
+  #  database          => $database,
+  #  database_host     => $database_host,
+  #  database_port     => $database_port,
+  #  database_username => $database_username,
+  #  database_password => $database_password,
+  #  database_name     => $database_name,
+  #}
 
   #Set the defaults
   Ini_setting {
