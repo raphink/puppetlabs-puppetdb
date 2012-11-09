@@ -55,6 +55,17 @@
 #                            all TCP connections).
 #   ['confdir']            - The puppetdb configuration directory; defaults to
 #                            `/etc/puppetdb/conf.d`.
+#   ['puppet_ssldir']      - Puppet's SSL directory.
+#   ['ca_cert']            - The SSL CA certificate used.
+#   ['ssl_cert']           - The SSL certificate for $ssl_listen_address,
+#                            signed by the CA.
+#   ['ssl_private_key']    - The SSL private key for $ssl_listen_address.
+#                            `/etc/puppetdb/conf.d`.
+#   ['key_password']       - The password to use for the keystore.
+#   ['trust_password']     - The password to use for the truststore.
+#   ['ssl_generate_key']   - Whether to generate the key.
+#                            You should use this only if your puppetdb machine
+#                            is also your CA machine.
 #
 # Actions:
 # - Creates and manages a puppetdb server
@@ -81,6 +92,13 @@ class puppetdb::server(
   $puppetdb_service        = $puppetdb::params::puppetdb_service,
   $manage_redhat_firewall  = $puppetdb::params::manage_redhat_firewall,
   $confdir                 = $puppetdb::params::confdir,
+  $puppet_ssldir           = $puppetdb::params::puppet_ssldir,
+  $ca_cert                 = "${puppet_ssldir}/certs/ca.pem",
+  $ssl_cert                = "${puppet_ssldir}/certs/${ssl_listen_address}.pem",
+  $ssl_private_key         = "${puppet_ssldir}/private_keys/${ssl_listen_address}.pem",
+  $key_password            = $puppetdb::params::key_password,
+  $trust_password          = $puppetdb::params::trust_password,
+  $ssl_generate_key        = true,
   $gc_interval             = $puppetdb::params::gc_interval,
 ) inherits puppetdb::params {
 
@@ -105,11 +123,23 @@ class puppetdb::server(
     notify            => Service[$puppetdb_service],
   }
 
+  class {'puppetdb::ssl':
+    ssl_listen_address => $ssl_listen_address,
+    ca_cert            => $ca_cert,
+    trust_password     => $trust_password,
+    key_password       => $key_password,
+    ssl_cert           => $ssl_cert,
+    ssl_private_key    => $ssl_private_key,
+    ssl_generate_key   => $ssl_generate_key,
+  }
+
   class { 'puppetdb::server::jetty_ini':
-    ssl_listen_address  => $ssl_listen_address,
-    ssl_listen_port     => $ssl_listen_port,
-    confdir             => $confdir,
-    notify              => Service[$puppetdb_service],
+    ssl_listen_address => $ssl_listen_address,
+    ssl_listen_port    => $ssl_listen_port,
+    confdir            => $confdir,
+    key_password       => $key_password,
+    trust_password     => $trust_password,
+    notify             => Service[$puppetdb_service],
   }
 
   service { $puppetdb_service:
