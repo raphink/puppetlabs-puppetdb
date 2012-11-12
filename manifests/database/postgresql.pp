@@ -24,7 +24,7 @@
 #   puppetdb
 #
 # Requires:
-# - `inkling/postgresql`
+# - `camptocamp/postgresql`
 #
 # Sample Usage:
 #   class { 'puppetdb::database::postgresql':
@@ -37,21 +37,29 @@ class puppetdb::database::postgresql(
   $manage_redhat_firewall = $puppetdb::params::manage_redhat_firewall,
 ) inherits puppetdb::params {
 
-  # get the pg server up and running
-  class { '::postgresql::server':
-    config_hash => {
-      # TODO: make this stuff configurable
-      'ip_mask_allow_all_users' => '0.0.0.0/0',
-      'listen_addresses'        => $listen_addresses,
-      'manage_redhat_firewall'  => $manage_redhat_firewall,
-    },
+
+  ::postgresql::user {'puppetdb':
+      ensure     => present,
+      password   => 'puppetdb',
+      superuser  => false,
+      createdb   => false,
+      createrole => false,
   }
 
-  # create the puppetdb database
-  postgresql::db{ 'puppetdb':
-    user     => 'puppetdb',
-    password => 'puppetdb',
-    grant    => 'all',
-    require  => Class['::postgresql::server'],
+  ::postgresql::database {'puppetdb':
+    ensure    => present,
+    owner     => 'puppetdb',
+    encoding  => 'UTF8',
+    template  => 'template1',
+    overwrite => false,
+    require   => Postgresql::User['puppetdb'],
+  }
+
+  ::postgresql::hba {'access to database puppetdb':
+    ensure   => present,
+    type     => 'local',
+    database => 'puppetdb',
+    user     => 'all',
+    method   => 'trust',
   }
 }
