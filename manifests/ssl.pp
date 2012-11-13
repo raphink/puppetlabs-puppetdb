@@ -62,7 +62,6 @@ class puppetdb::ssl (
     pkey_pass => $key_password,
     keystore  => '/etc/puppetdb/ssl/keystore.jks',
     storepass => $key_password,
-    before    => Puppetdb_conn_validator['puppetdb_conn'],
   }
 
   file {[
