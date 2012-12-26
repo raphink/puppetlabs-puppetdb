@@ -35,30 +35,33 @@ class puppetdb::database::postgresql(
   # TODO: expose more of the parameters from `inkling/postgresql`!
   $listen_addresses       = $puppetdb::params::database_host,
   $manage_redhat_firewall = $puppetdb::params::manage_redhat_firewall,
+  $database_name = $puppetdb::params::database_name,
+  $database_username = $puppetdb::params::database_username,
+  $database_password = $puppetdb::params::database_password,
 ) inherits puppetdb::params {
 
 
-  ::postgresql::user {'puppetdb':
+  ::postgresql::user {$database_username:
       ensure     => present,
-      password   => 'puppetdb',
+      password   => $database_password,
       superuser  => false,
       createdb   => false,
       createrole => false,
   }
 
-  ::postgresql::database {'puppetdb':
+  ::postgresql::database {$database_name:
     ensure    => present,
-    owner     => 'puppetdb',
+    owner     => $database_username,
     encoding  => 'UTF8',
     template  => 'template1',
     overwrite => false,
-    require   => Postgresql::User['puppetdb'],
+    require   => Postgresql::User[$database_username],
   }
 
   ::postgresql::hba {'access to database puppetdb':
     ensure   => present,
     type     => 'local',
-    database => 'puppetdb',
+    database => $database_name,
     user     => 'all',
     method   => 'trust',
   }
