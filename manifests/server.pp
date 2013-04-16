@@ -139,7 +139,6 @@ class puppetdb::server(
   $key_password            = $puppetdb::params::key_password,
   $trust_password          = $puppetdb::params::trust_password,
   $ssl_generate_key        = true,
-  $gc_interval             = $puppetdb::params::gc_interval,
 ) inherits puppetdb::params {
 
   # Apply necessary suffix if zero is specified.
@@ -199,14 +198,16 @@ class puppetdb::server(
     notify            => Service[$puppetdb_service],
   }
 
-  class {'puppetdb::ssl':
-    ssl_listen_address => $ssl_listen_address,
-    ca_cert            => $ca_cert,
-    trust_password     => $trust_password,
-    key_password       => $key_password,
-    ssl_cert           => $ssl_cert,
-    ssl_private_key    => $ssl_private_key,
-    ssl_generate_key   => $ssl_generate_key,
+  if !$disable_ssl {
+    class {'puppetdb::ssl':
+      ssl_listen_address => $ssl_listen_address,
+      ca_cert            => $ca_cert,
+      trust_password     => $trust_password,
+      key_password       => $key_password,
+      ssl_cert           => $ssl_cert,
+      ssl_private_key    => $ssl_private_key,
+      ssl_generate_key   => $ssl_generate_key,
+    }
   }
 
   class { 'puppetdb::server::jetty_ini':
