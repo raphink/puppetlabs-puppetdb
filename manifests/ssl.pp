@@ -3,7 +3,7 @@
 # This class provides a simple way to configure SSL certificates for puppetdb,
 # including the truststore and keystore.
 #
-# It requires the camptocamp/java module in order to work.
+# It requires the puppetlabs/java_ks module in order to work.
 #
 # This class is called by puppetdb::server.
 # You shouldn't have to call it directly.
@@ -21,7 +21,7 @@
 # - Creates and manages the truststore/keystore for a puppetdb server
 #
 # Requires:
-# - `camptocamp/java`
+# - `puppetlabs/java_ks`
 # - `camptocamp/puppet`
 #
 # Sample Usage:
