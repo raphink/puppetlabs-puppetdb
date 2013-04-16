@@ -46,22 +46,21 @@ class puppetdb::ssl (
 
   if $ssl_generate_key {
     ::puppet::cert {$ssl_listen_address:
-      before => Java::Keystore::Import::Key[$ssl_listen_address],
+      before => Java_ks["${ssl_listen_address}:/etc/puppetdb/ssl/keystore.jks"],
     }
   }
 
-  ::java::keystore::import::cert {'Puppetmaster_CA':
-    cert      => $ca_cert,
-    keystore  => '/etc/puppetdb/ssl/truststore.jks',
-    storepass => $trust_password,
+  java_ks { 'Puppetmaster_CA:/etc/puppetdb/ssl/truststore.jks':
+    ensure      => latest,
+    certificate => $ca_cert,
+    password    => $trust_password,
   }
 
-  ::java::keystore::import::key {$ssl_listen_address:
-    cert      => $ssl_cert,
-    pkey      => $ssl_private_key,
-    pkey_pass => $key_password,
-    keystore  => '/etc/puppetdb/ssl/keystore.jks',
-    storepass => $key_password,
+  java_ks { "${ssl_listen_address}:/etc/puppetdb/ssl/keystore.jks":
+    ensure      => latest,
+    certificate => $ssl_cert,
+    private_key => $ssl_private_key,
+    password    => $key_password,
   }
 
   file {[
