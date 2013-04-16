@@ -30,7 +30,7 @@
 #   puppetdb
 #
 # Requires:
-# - `inkling/postgresql`
+# - `camptocamp/postgresql`
 #
 # Sample Usage:
 #   class { 'puppetdb::database::postgresql':
