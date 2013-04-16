@@ -94,9 +94,6 @@
 #                            `/etc/puppetdb/conf.d`.
 #   ['key_password']       - The password to use for the keystore.
 #   ['trust_password']     - The password to use for the truststore.
-#   ['ssl_generate_key']   - Whether to generate the key.
-#                            You should use this only if your puppetdb machine
-#                            is also your CA machine.
 #
 # Actions:
 # - Creates and manages a puppetdb server
@@ -138,7 +135,6 @@ class puppetdb::server(
   $ssl_private_key         = "${puppet_ssldir}/private_keys/${ssl_listen_address}.pem",
   $key_password            = $puppetdb::params::key_password,
   $trust_password          = $puppetdb::params::trust_password,
-  $ssl_generate_key        = true,
 ) inherits puppetdb::params {
 
   # Apply necessary suffix if zero is specified.
@@ -206,7 +202,6 @@ class puppetdb::server(
       key_password       => $key_password,
       ssl_cert           => $ssl_cert,
       ssl_private_key    => $ssl_private_key,
-      ssl_generate_key   => $ssl_generate_key,
     }
   }
 
